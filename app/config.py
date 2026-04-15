@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from dataclasses import dataclass
 import os
 
@@ -7,12 +8,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+=======
+from dataclasses import dataclass
+import os
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
 @dataclass
 class Config:
     bot_token: str
     admin_id: int | None
     database_url: str
     github_repo_url: str | None
+<<<<<<< HEAD
 
 
 def get_config() -> Config:
@@ -22,6 +35,17 @@ def get_config() -> Config:
     if not bot_token:
         raise ValueError("Не найден BOT_TOKEN в .env")
 
+=======
+
+
+def get_config() -> Config:
+    bot_token = os.getenv("BOT_TOKEN")
+    database_url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/bot.db")
+
+    if not bot_token:
+        raise ValueError("Не найден BOT_TOKEN в .env")
+
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
     admin_id_raw = os.getenv("ADMIN_ID")
     admin_id = int(admin_id_raw) if admin_id_raw else None
     github_repo_url = os.getenv("GITHUB_REPO_URL")

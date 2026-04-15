@@ -3,8 +3,13 @@ from decimal import Decimal
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Numeric, String, Text, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+<<<<<<< HEAD
 
 
+=======
+
+
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
 class Base(DeclarativeBase):
     pass
 
@@ -42,6 +47,7 @@ class Item(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+<<<<<<< HEAD
 
     repair_details: Mapped["RepairDetails | None"] = relationship(
         back_populates="item",
@@ -55,13 +61,33 @@ class Item(Base):
         cascade="all, delete-orphan",
     )
 
+=======
+
+    repair_details: Mapped["RepairDetails | None"] = relationship(
+        back_populates="item",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    resale_details: Mapped["ResaleDetails | None"] = relationship(
+        back_populates="item",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
     expenses: Mapped[list["Expense"]] = relationship(
         back_populates="item",
         cascade="all, delete-orphan",
     )
     avito_chats: Mapped[list["AvitoChat"]] = relationship(back_populates="linked_item")
+<<<<<<< HEAD
 
 
+=======
+
+
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
 class RepairDetails(Base):
     __tablename__ = "repair_details"
 
@@ -95,6 +121,7 @@ class Client(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     repair_details: Mapped[list["RepairDetails"]] = relationship(back_populates="client")
+<<<<<<< HEAD
 
 
 class ResaleDetails(Base):
@@ -118,6 +145,31 @@ class Expense(Base):
     title: Mapped[str] = mapped_column(String(255))
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
+=======
+
+
+class ResaleDetails(Base):
+    __tablename__ = "resale_details"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.id", ondelete="CASCADE"), unique=True)
+
+    buy_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=0)
+    sell_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=0)
+
+    item: Mapped["Item"] = relationship(back_populates="resale_details")
+
+
+class Expense(Base):
+    __tablename__ = "expenses"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.id", ondelete="CASCADE"))
+
+    title: Mapped[str] = mapped_column(String(255))
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2))
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+>>>>>>> a10dbcbe6d1583d104c08155d07967d95b67c23e
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     item: Mapped["Item"] = relationship(back_populates="expenses")
