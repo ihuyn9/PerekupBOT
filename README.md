@@ -28,14 +28,5 @@
 -Создаем в папке файл .env и запускаем его через удобный редактор
 -Меняем свой BOT_TOKEN и ADMIN_ID
 -закидываем папку на свой vds-сервер 
--Устанавливаем, обновляем python, и запускаем на vds
-- cd PerekupBOT
-- sudo apt update
-- sudo apt install python3-venv
-- python3 -m venv venv
-- source venv/bin/activate
-- pip install --upgrade pip
-- pip install -r requirements.txt
-- python run.py
 
 # PerekupBot
