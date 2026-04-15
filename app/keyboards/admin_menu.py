@@ -12,6 +12,8 @@ def get_admin_panel_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="📣 Рассылка", callback_data="admin:broadcast")],
             [InlineKeyboardButton(text="📋 Активность", callback_data="admin:activity")],
             [InlineKeyboardButton(text="✏️ Тексты бота", callback_data="admin:texts")],
+            [InlineKeyboardButton(text="⬇️ Обновить из GitHub", callback_data="admin:update")],
+            [InlineKeyboardButton(text="🔄 Перезапустить бота", callback_data="admin:restart")],
             [InlineKeyboardButton(text="🛑 Остановить бота", callback_data="admin:stop")],
         ]
     )

@@ -1,3 +1,4 @@
+import asyncio
 from html import escape
 
 from aiogram import F, Router
@@ -16,6 +17,7 @@ from app.keyboards.admin_menu import (
 from app.keyboards.main_menu import get_cancel_keyboard, get_main_menu
 from app.services.activity_logs import list_recent_activity
 from app.services.bot_texts import get_text, set_text
+from app.services.bot_control import is_github_bound, restart_current_process, update_from_github
 from app.services.bot_users import (
     get_admin_dashboard_stats,
     get_broadcast_targets,
@@ -40,7 +42,7 @@ def has_admin_access(user_id: int) -> bool:
 
 
 def build_admin_dashboard_text(stats: dict) -> str:
-    repo_url = escape(config.github_repo_url or "не указан")
+    github_status = "привязан" if is_github_bound(config.github_repo_url) else "не привязан"
     return (
         "🛠 <b>Админ-панель</b>\n\n"
         f"Всего пользователей: {stats['total_users']}\n"
@@ -52,8 +54,21 @@ def build_admin_dashboard_text(stats: dict) -> str:
         f"Всего шаблонов ответов: {stats['templates_total']}\n"
         f"Забаненных пользователей: {stats['banned_users']}\n"
         f"Выключили рассылку: {stats['broadcast_disabled']}\n\n"
-        f"GitHub repo: {repo_url}"
+        f"GitHub: {github_status}"
     )
+
+
+def build_git_update_text(result) -> str:
+    status = "✅" if result.success else "⚠️"
+    text = f"{status} <b>{escape(result.message)}</b>"
+
+    if result.success:
+        text += "\n\nЧтобы кодовые изменения применились, нажми «Перезапустить бота»."
+
+    if result.details:
+        text += f"\n\n<pre>{escape(result.details)}</pre>"
+
+    return text
 
 
 def build_user_card(stats: dict) -> str:
@@ -306,6 +321,33 @@ async def save_text_value(message: Message, state: FSMContext) -> None:
         f"Текст «{BOT_TEXT_TITLES[text_key]}» обновлен.",
         reply_markup=get_main_menu(is_admin=True),
     )
+
+
+@router.callback_query(F.data == "admin:update")
+async def update_bot_from_github(callback: CallbackQuery) -> None:
+    if not has_admin_access(callback.from_user.id):
+        await callback.answer("Нет доступа.", show_alert=True)
+        return
+
+    await callback.answer("Обновляю из GitHub...")
+    await callback.message.answer("Запускаю обновление из GitHub. Это может занять несколько секунд...")
+
+    result = await update_from_github(config.github_repo_url)
+    await callback.message.answer(
+        build_git_update_text(result),
+        reply_markup=get_admin_panel_keyboard(),
+    )
+
+
+@router.callback_query(F.data == "admin:restart")
+async def restart_bot(callback: CallbackQuery) -> None:
+    if not has_admin_access(callback.from_user.id):
+        await callback.answer("Нет доступа.", show_alert=True)
+        return
+
+    await callback.message.answer("Перезапускаю бота...")
+    await callback.answer()
+    asyncio.create_task(restart_current_process())
 
 
 @router.callback_query(F.data == "admin:stop")
